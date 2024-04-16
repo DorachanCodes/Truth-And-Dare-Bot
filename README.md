@@ -53,6 +53,3 @@ Contributions are welcome! If you have any suggestions, bug reports, or feature 
 
 This project is licensed under the [MIT License](LICENSE).
 
----
-
-Feel free to customize this template according to your project's specific details and requirements. Let me know if you need further assistance!

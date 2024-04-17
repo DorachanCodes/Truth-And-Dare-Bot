@@ -1,5 +1,5 @@
 const TelegramBot = require("node-telegram-bot-api");
-const token = process.env['MY_SECRET']; ; // Add your bot token from @botfather for this to work
+const token = process.env['MY_SECRET']; // Add your bot token from @botfather for this to work
 const axios = require("axios");
 
 const express = require("express");
@@ -36,11 +36,13 @@ bot.on("message", async (msg) => {
         bot.sendMessage(chatId, xname + "  Joined The Game ")
       }
 
-      else if (xtxt == "/stop" || xtxt==="/stop@Truth_Dare2_Bot") {
+      else if (xtxt == "/stop" || xtxt==="/stop@Truth_Dare2_Bot"
+    ) {
         if (nameArr.length < 2)
           bot.sendMessage(chatId, "Need 2 or More Players  To Play!");
         else {
-          bot.sendMessage(chatId, "Game Started....Choosing 2 Random Players , One Will Ask Truth/Dare , Other Will Answer");
+
+continu: bot.sendMessage(chatId, "Game Started....Choosing 2 Random Players , One Will Ask Truth/Dare , Other Will Answer");
           const rnd1 = random(nameArr.length);
           let rnd2 = random(nameArr.length);
           while (rnd1 == rnd2) {
@@ -59,7 +61,7 @@ bot.on("message", async (msg) => {
           };
 
           bot.sendMessage(asker.CiD, asker.nm + " will select the truth/dare Question for " + answerer.nm +
-            "\n " + answerer.nm + " , What you want to answer? Truth or Dare?", {
+            "\n So " + answerer.nm + " , What you want to answer? Truth or Dare?", {
             reply_markup: {
               inline_keyboard: [
                 [{ text: "Truth", callback_data: "1" }],
@@ -68,78 +70,112 @@ bot.on("message", async (msg) => {
             },
           });
 
-
+         
           bot.once("callback_query", (query) => {
             const choice = query.data;
             const player = query.from.first_name;
-
-            if (choice === "1" && player === answerer.nm) {
-              bot.sendMessage(asker.CiD, answerer.nm + " Choosed Truth . Kindly Give Him a Truth , You Have 30s to Act , If You Fail to ask him a Truth Within 30s , I will Ask him a Truth... You can Also Use /pass to allow me to Instantly give him a truth on behalf of you");
-              bot.on("message", async (msg) => {
+              console.log("player:"+player+" arr  :"+answerer.nm);
+          
+              if(player === answerer.nm&&choice==="1")
+              {
+              bot.sendMessage(asker.CiD, answerer.nm + " Chose Truth . Kindly Give Him a Truth , You Have 60s to Act , If You Fail to ask him a Truth Within 30s , I will Ask him a Truth... You can Also Use /pass to allow me to Instantly give him a truth on behalf of you \n kindly use /q command before the question");
+              bot.on("message", (msg) => {
+                console.log(msg);
                 const Id0 = msg.chat.id;
                 const txtP = msg.text;
                 const nmP = msg.from.first_name;
+                console.log(msg);
+
+
+                
+                
                 if ((txtP == "/pass" || txtP == "/pass@Truth_Dare2_Bot") && nmP == asker.nm) {
                   botTruth(Id0, nmP, answerer.nm, answerer.CiD);
                 }
-                else
-                  setTimeout(function () {
-                    if (txtP == '') {
-                      bot.sendMessage(Id0, "Time Wasting Mf didnt asked the truth , I will Ask You The Truth ");
-                      botTruth(Id0, nmP, answerer.nm, answerer.CiD);
-                    }
-                    else
-                      bot.sendMessage(Id0, "Here is Your Truth , " + answerer.nm + " : " + txtP + "   You Have 30s to Answer ! ");
-                    bot.on("message", async (msg) => {
-                      const Id1 = msg.chat.id;
-                      const txt1 = msg.text;
-                      const nm1 = msg.from.first_name;
-                      if (nm1 == answerer.nm)
-                        bot.sendMessage(answerer.CiD, nm1 + " Answered His Truth With " + txt1);
-                    });
-                  }
+                else if((txtP!="/pass"||txtP!="/pass@Truth_Dare2_Bot")&& nmP == asker.nm){
+                  bot.sendMessage(Id0, "Here is Your Truth , " + answerer.nm + " : " + txtP + "   You Have 30s to Answer ! \n kindly use /a before ur answer to answer ");
+                bot.on("message", (msg) => {
+                  const Id1 = msg.chat.id;
+                  const txt1 = msg.text;
+                  const nm1 = msg.from.first_name;
 
-                  )
+      
+
+
+                  if (nm1 == answerer.nm)
+                    bot.sendMessage(answerer.CiD, nm1 + " Answered His Truth With " + txt1.replace("/a","")+"\n To Play Again Send /replay");
+                    
+    
+
+                  
+                ;})}
+                setTimeout(function () {
+
+                  if(txtP.length==0&&nmP==asker.nm)
+                  {
+                  bot.sendMessage(Id0, "Time Wasting Mf didnt gave him a Truth  , I will give him a Truth");
+                  botTruth(Id0, nmP, answerer.nm, answerer.CiD);}
+                
+
+
+               
               }
-              )
-
-            }
-            else if (choice === "2" && player === answerer.nm){
-              bot.sendMessage(asker.CiD, answerer.nm + " Choosed Dare . Kindly Give Him a Dare , You Have 30s to Act , If You Fail to give him a Dare Within 30s , I will Give him a Dare... You can Also Use /pass to allow me to Instantly give him a Dare on behalf of you");
-              bot.on("message", async (msg) => {
+             ,60000 )
+            })}
+            
+             else if (choice === "2" && player === answerer.nm){
+              bot.sendMessage(asker.CiD, answerer.nm + " Choosed Dare . Kindly Give Him a Dare , You Have 60s to Act , If You Fail to give him a Dare Within 30s , I will Give him a Dare... You can Also Use /pass to allow me to Instantly give him a Dare on behalf of you");
+              bot.on("message", (msg) => {
                 const Id0 = msg.chat.id;
                 const txtP = msg.text;
                 const nmP = msg.from.first_name;
                 if ((txtP == "/pass" || txtP == "/pass@Truth_Dare2_Bot") && nmP == asker.nm) {
                   botDare(Id0, nmP, answerer.nm, answerer.CiD);
                 }
-                else
-                  setTimeout(function () {
-                    if (txtP == '') {
-                      bot.sendMessage(Id0, "Time Wasting Mf didnt gave him a Dare  , I will give him a Dare ");
-                      botDare(Id0, nmP, answerer.nm, answerer.CiD);
-                    }
-                    else
-                      bot.sendMessage(Id0, "Here is Your Dare , " + answerer.nm + " : " + txtP + "   You Have 30s to Answer ! ");
-                    bot.on("message", async (msg) => {
-                      const Id1 = msg.chat.id;
-                      const txt1 = msg.text;
-                      const nm1 = msg.from.first_name;
-                      if (nm1 == answerer.nm)
-                        bot.sendMessage(answerer.CiD, nm1 + " Answered His Dare With " + txt1);
-                      });
+                else if ((txtP != '/pass'||txtP!="/pass@Truth_Dare2_Bot")&& nmP == asker.nm){
+
+                  bot.sendMessage(Id0, "Here is Your Dare , " + answerer.nm + " : " + txtP + "   You Have 60s to Answer ! ");
+                  bot.on("message",  (msg) => {
+                    const Id1 = msg.chat.id;
+                    const txt1 = msg.text;
+                    const nm1 = msg.from.first_name;
+                    if (nm1 == answerer.nm)
+                      bot.sendMessage(answerer.CiD, nm1 + " Answered His Dare With " + txt1);
+                    });
+                    setTimeout(function () {
+
+                  if(txtP.length==0)
+                      {
+                      bot.sendMessage(Id0, "Time Wasting Mf didnt gave him a Truth  , I will give him a Truth");
+                      botTruth(Id0, nmP, answerer.nm, answerer.CiD);}
+
+                     if(txt1.length==0)
+                     bot.sendMessage(Id0, "Times Up , send /again to play again with same players that joined before or start a new game by /start");
+
+                    },60000);
+                 
+                    
                     }
   
-                    )
+             })
+
+             bot.on("message", (msg) => {
+              const Idr = msg.chat.id;
+              const txtr = msg.text;
+              const nmR = msg.from.first_name;
+              if(txtr==="/again")
+            againPlay(Idr);
+            })
+
+
                 }
-                )
+        })
               }
-          })
+          }})
         }
       }
-    })
-  }
-})
+    
+);
 
 function random(arrLen) {
   return Math.floor(Math.random() * arrLen);
@@ -168,7 +204,7 @@ function botTruth(asker_CiD, asker_nm, answerer_nm, answerer_CiD) {
 
 
       const response = await axios(url);
-      const ques = await response.json();
+      const ques = response.data;
 
       const res1 = ques.question;
 
@@ -206,7 +242,7 @@ function botDare(asker_CiD, asker_nm, answerer_CiD, answerer_nm) {
 
 
       const response1 = await axios(url1);
-      const ques1 = await response1.json();
+      const ques1 = response1.data;
 
       const res11 = ques1.question;
 
@@ -224,3 +260,125 @@ function botDare(asker_CiD, asker_nm, answerer_CiD, answerer_nm) {
   }
   )
 }
+
+function againPlay(cid90)
+{
+  bot.sendMessage(chatId, "Game Started....Choosing 2 Random Players , One Will Ask Truth/Dare , Other Will Answer");
+  const rnd1 = random(nameArr.length);
+  let rnd2 = random(nameArr.length);
+  while (rnd1 == rnd2) {
+    rnd2 = random(nameArr.length);
+  }
+
+
+  let asker = {
+    nm: nameArr[rnd1],
+    CiD: chatIdArr[rnd1],
+  };
+  let answerer =
+  {
+    nm: nameArr[rnd2],
+    CiD: chatIdArr[rnd2],
+  };
+
+  bot.sendMessage(asker.CiD, asker.nm + " will select the truth/dare Question for " + answerer.nm +
+    "\n So " + answerer.nm + " , What you want to answer? Truth or Dare?", {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "Truth", callback_data: "1" }],
+        [{ text: "Dare", callback_data: "2" }],
+      ],
+    },
+  });
+
+ 
+  bot.once("callback_query", (query) => {
+    const choice = query.data;
+    const player = query.from.first_name;
+      console.log("player:"+player+" arr  :"+answerer.nm);
+  
+      if(player === answerer.nm&&choice==="1")
+      {
+      bot.sendMessage(asker.CiD, answerer.nm + " Chose Truth . Kindly Give Him a Truth , You Have 60s to Act , If You Fail to ask him a Truth Within 30s , I will Ask him a Truth... You can Also Use /pass to allow me to Instantly give him a truth on behalf of you \n kindly use /q command before the question");
+      bot.on("message", (msg) => {
+        console.log(msg);
+        const Id0 = msg.chat.id;
+        const txtP = msg.text;
+        const nmP = msg.from.first_name;
+        console.log(msg);
+
+
+        
+        
+        if ((txtP == "/pass" || txtP == "/pass@Truth_Dare2_Bot") && nmP == asker.nm) {
+          botTruth(Id0, nmP, answerer.nm, answerer.CiD);
+        }
+        else if((txtP!="/pass"||txtP!="/pass@Truth_Dare2_Bot")&& nmP == asker.nm){
+          bot.sendMessage(Id0, "Here is Your Truth , " + answerer.nm + " : " + txtP + "   You Have 30s to Answer ! \n kindly use /a before ur answer to answer ");
+        bot.on("message", (msg) => {
+          const Id1 = msg.chat.id;
+          const txt1 = msg.text;
+          const nm1 = msg.from.first_name;
+
+
+
+
+          if (nm1 == answerer.nm)
+            bot.sendMessage(answerer.CiD, nm1 + " Answered His Truth With " + txt1.replace("/a","")+"\n To Play Again Send /replay");
+            
+
+
+          
+        ;})}
+        setTimeout(function () {
+
+          if(txtP.length==0&&nmP==asker.nm)
+          {
+          bot.sendMessage(Id0, "Time Wasting Mf didnt gave him a Truth  , I will give him a Truth");
+          botTruth(Id0, nmP, answerer.nm, answerer.CiD);}
+        
+
+
+       
+      }
+     ,60000 )
+    })}
+    
+     else if (choice === "2" && player === answerer.nm){
+      bot.sendMessage(asker.CiD, answerer.nm + " Choosed Dare . Kindly Give Him a Dare , You Have 60s to Act , If You Fail to give him a Dare Within 30s , I will Give him a Dare... You can Also Use /pass to allow me to Instantly give him a Dare on behalf of you");
+      bot.on("message", (msg) => {
+        const Id0 = msg.chat.id;
+        const txtP = msg.text;
+        const nmP = msg.from.first_name;
+        if ((txtP == "/pass" || txtP == "/pass@Truth_Dare2_Bot") && nmP == asker.nm) {
+          botDare(Id0, nmP, answerer.nm, answerer.CiD);
+        }
+        else if ((txtP != '/pass'||txtP!="/pass@Truth_Dare2_Bot")&& nmP == asker.nm){
+
+          bot.sendMessage(Id0, "Here is Your Dare , " + answerer.nm + " : " + txtP + "   You Have 60s to Answer ! ");
+          bot.on("message",  (msg) => {
+            const Id1 = msg.chat.id;
+            const txt1 = msg.text;
+            const nm1 = msg.from.first_name;
+            if (nm1 == answerer.nm)
+              bot.sendMessage(answerer.CiD, nm1 + " Answered His Dare With " + txt1);
+            });
+            setTimeout(function () {
+
+          if(txtP.length==0)
+              {
+              bot.sendMessage(Id0, "Time Wasting Mf didnt gave him a Truth  , I will give him a Truth");
+              botTruth(Id0, nmP, answerer.nm, answerer.CiD);}
+
+             if(txt1.length==0)
+             bot.sendMessage(Id0, "Times Up");
+
+            },60000);
+         
+            
+            }
+
+     })
+        }
+})
+      }
